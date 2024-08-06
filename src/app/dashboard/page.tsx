@@ -5,7 +5,11 @@ import { connect, getConnectionInfo } from "@/elastic";
 
 export const revalidate = 20;
 
-
+interface Sensor {
+  sensorId: string;
+  status: string;
+  readingDate: string;
+}
 
 export default async function Dashboard() {
   const client = await connect();
@@ -15,7 +19,7 @@ export default async function Dashboard() {
     : null;
 
   const sensors = await client.search({index: "sensor_readings", size: 20})
-  const response = await client.search({
+  const sensorResponse = await client.search({
     index: 'sensor_readings',
     size: 0,  // No need to fetch actual documents
     body: {
@@ -55,15 +59,11 @@ export default async function Dashboard() {
     }
   });
 
-  const uniqueSensorsJSON = JSON.stringify(response, null, 2)
-  console.log(uniqueSensorsJSON)
+
+  // @ts-ignore
+  const sensorReading = sensorResponse.aggregations?.["unique_sensor_ids"]["buckets"]
+  console.log(sensorReading)
   
-  
-
-
-  
-
-
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
