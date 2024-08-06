@@ -5,12 +5,35 @@ import { connect, getConnectionInfo } from "@/elastic";
 
 export const revalidate = 20;
 
+
+
 export default async function Dashboard() {
   const client = await connect();
   const connectionData = await getConnectionInfo();
   const numberOfDocuments = connectionData.connected
     ? await client.count()
     : null;
+
+  const sensors = await client.search({index: "sensor_readings", size: 20})
+  const uniqueSensorIds = await client.search({
+    index: 'sensor_readings',
+    size: 0,
+    body: {
+      aggs: {
+        unique_sensor_ids: {
+          terms: {
+            field: 'sensorId',
+            size: 20
+          }
+        }
+      }
+    }
+  });
+
+  console.log(JSON.stringify(uniqueSensorIds, null, 2))
+  
+
+
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
