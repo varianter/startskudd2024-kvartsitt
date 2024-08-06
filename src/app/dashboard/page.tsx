@@ -48,7 +48,7 @@ export default async function Dashboard() {
                   }
                 ],
                 _source: {
-                  includes: ['sensorId', 'status', 'readingDate']
+                  includes: ['sensorId', 'status', 'readingDate', ]
                 },
                 size: 1
               }
@@ -62,8 +62,8 @@ export default async function Dashboard() {
 
   // @ts-ignore
   const sensorReading = sensorResponse.aggregations?.["unique_sensor_ids"]["buckets"]
-  console.log(sensorReading)
-  
+  const latestSensors = sensorReading.map((sensor: any) => sensor.latest_reading.hits.hits[0]._source)
+  console.log(latestSensors)
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -95,11 +95,25 @@ export default async function Dashboard() {
             )}
           </CardContent>
         </Card>
+        
       </div>
-
-
-      <div>
-
+      <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+        <Card x-chunk="dashboard-01-chunk-5">
+          <CardHeader>
+            <CardTitle className="gap-2 flex">
+              Sensor Readings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-8">
+            {latestSensors.map((sensor: Sensor) => (
+              <div key={sensor.sensorId} className="flex justify-between">
+                <p>{sensor.sensorId}</p>
+                <p>{sensor.status}</p>
+                <p>{sensor.readingDate}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     </main>
   );
