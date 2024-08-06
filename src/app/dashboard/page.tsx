@@ -15,22 +15,52 @@ export default async function Dashboard() {
     : null;
 
   const sensors = await client.search({index: "sensor_readings", size: 20})
-  const uniqueSensorIds = await client.search({
+  const response = await client.search({
     index: 'sensor_readings',
-    size: 0,
+    size: 0,  // No need to fetch actual documents
     body: {
       aggs: {
         unique_sensor_ids: {
-          terms: {
-            field: 'sensorId',
-            size: 20
+          composite: {
+            size: 20,  // Number of unique sensorIds to fetch
+            sources: [
+              {
+                sensorId: {
+                  terms: {
+                    field: 'sensorId'
+                  }
+                }
+              }
+            ]
+          },
+          aggs: {
+            latest_reading: {
+              top_hits: {
+                sort: [
+                  {
+                    readingDate: {
+                      order: 'desc'
+                    }
+                  }
+                ],
+                _source: {
+                  includes: ['sensorId', 'status', 'readingDate']
+                },
+                size: 1
+              }
+            }
           }
         }
       }
     }
   });
 
-  console.log(JSON.stringify(uniqueSensorIds, null, 2))
+  const uniqueSensorsJSON = JSON.stringify(response, null, 2)
+  console.log(uniqueSensorsJSON)
+  
+  
+
+
   
 
 
@@ -65,6 +95,11 @@ export default async function Dashboard() {
             )}
           </CardContent>
         </Card>
+      </div>
+
+
+      <div>
+
       </div>
     </main>
   );
