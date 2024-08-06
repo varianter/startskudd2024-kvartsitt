@@ -9,6 +9,7 @@ interface Sensor {
   sensorId: string;
   status: string;
   readingDate: string;
+  deltaMovementInMm: string;
 }
 
 export default async function Dashboard() {
@@ -48,7 +49,7 @@ export default async function Dashboard() {
                   }
                 ],
                 _source: {
-                  includes: ['sensorId', 'status', 'readingDate', ]
+                  includes: ['sensorId', 'status', 'readingDate', 'deltaMovementInMm' ]
                 },
                 size: 1
               }
@@ -110,6 +111,7 @@ export default async function Dashboard() {
                 <p>{sensor.sensorId}</p>
                 <p>{sensor.status}</p>
                 <p>{sensor.readingDate}</p>
+                <p>{parseFloat(sensor.deltaMovementInMm).toFixed(2)}</p> 
               </div>
             ))}
           </CardContent>
