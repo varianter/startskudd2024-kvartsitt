@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
             <TableRow>
               <TableHead>Sensor</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Last reading</TableHead>
+              <TableHead>Siste Måling</TableHead>
               <TableHead>Bevegelse</TableHead>
             </TableRow>
           </TableHeader>
@@ -76,14 +76,11 @@ const Dashboard: React.FC = () => {
                   </div>
                   <div>{sensor.status}</div>
                 </TableCell>
-                <TableCell>{moment(sensor.readingDate).format("DD.MM.YY HH:mm:ss")}</TableCell>
-                <TableCell className="text-left">
-                  {sensor.deltaMovementInMm === undefined ? (
-                    "Ingen data"
-                  ) : (
-                    parseFloat(sensor.deltaMovementInMm).toFixed(2) + " mm"
-                  )}
-                </TableCell>
+                <TableCell>{moment(sensor.readingDate).tz('Etc/GMT-2').format("DD.MM.YY HH:mm:ss")}</TableCell>
+                <TableCell className="text-left">{sensor.deltaMovementInMm == undefined ? (
+                  "-") : (
+                  parseFloat(sensor.deltaMovementInMm).toFixed(2) + " mm"
+                )}</TableCell>
               </TableRow>
             ))}
           </TableBody>
