@@ -1,12 +1,12 @@
-import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import Typography from "@/components/ui/typography";
-import { connect, getConnectionInfo } from "@/elastic";
-import moment from "moment";
-import Image from "next/image";
-moment.locale("no");
-export const revalidate = 20;
+"use client";
+import React, { useEffect, useState } from 'react';
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Typography from '@/components/ui/typography';
+import moment from 'moment';
+import Image from 'next/image';
+
+moment.locale('no');
 
 interface Sensor {
   sensorId: string;
@@ -15,99 +15,40 @@ interface Sensor {
   deltaMovementInMm: string;
 }
 
-export default async function Dashboard() {
-  const client = await connect();
-  const connectionData = await getConnectionInfo();
-  const numberOfDocuments = connectionData.connected
-    ? await client.count()
-    : null;
+const Dashboard: React.FC = () => {
+  const [latestSensors, setLatestSensors] = useState<Sensor[]>([]);
+  const [numberOfAlerts, setNumberOfAlerts] = useState<number>(0);
+  const setDataStart = async () => {
+    const response = await fetch('/api/sensors');
+    const data = await response.json();
+    console.log(data);
+    setLatestSensors(data.latestSensorsData);
+    setNumberOfAlerts(data.alertCounts);
+  }
+  setDataStart();
 
-  const sensors = await client.search({index: "sensor_readings", size: 20})
-
-
-  const sensorResponse = await client.search({
-    index: 'sensor_readings',
-    size: 0,  // No need to fetch actual documents
-    body: {
-      aggs: {
-        unique_sensor_ids: {
-          composite: {
-            size: 20, 
-            sources: [
-              {
-                sensorId: {
-                  terms: {
-                    field: 'sensorId'
-                  }
-                }
-              }
-            ]
-          },
-          aggs: {
-            latest_reading: {
-              top_hits: {
-                sort: [
-                  {
-                    readingDate: {
-                      order: 'desc'
-                    }
-                  }
-                ],
-                _source: {
-                  includes: ['sensorId', 'status', 'readingDate', 'deltaMovementInMm']
-                },
-                size: 1
-              }
-            }
-          }
-        }
+  useEffect(() => {
+    const fetchData = async () => {
+      // Fetch data from API with 5 second interval
+      const interval = setInterval(async () => {
+        const response = await fetch("/api/sensors");
+        const data = await response.json();
+        console.log(data);
+        setLatestSensors(data.latestSensorsData);
+        setNumberOfAlerts(data.alertCounts);
       }
-    }
-  });
+      , 5000);
+        return () => clearInterval(interval); // Cleanup the interval on component unmount
+      };
 
-  const last24Hours = await client.search({
-    index: 'sensor_readings',
-    body: {
-      query: {
-        bool: {
-          must: [
-            {
-              range: {
-                readingDate: {
-                  gte: 'now-3h',
-                }
-              }
-            },
-            {
-              range: {
-                deltaMovementInMm: {
-                  gt: 5,
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-  });
-
-
-  // @ts-ignore
-  const sensorReading = sensorResponse.aggregations?.["unique_sensor_ids"]["buckets"]
-  const latestSensors = sensorReading.map((sensor: any) => sensor.latest_reading.hits.hits[0]._source)
-
-
-  const numberOfAlerts = last24Hours.hits.hits.filter((sensor: any) => sensor._source.deltaMovementInMm > 5).length
-  console.log(numberOfAlerts)
-
-
+    fetchData();
+  }, []);
 
   return (
     <main className="grid grid-cols-3 gap-4 p-4 md:gap-8 md:p-8">
       <div className="col-span-full">
         <Typography variant="h1">Dashboard</Typography>
       </div>
-
 
       <div className="col-start-1 col-end-3">
         <Table>
@@ -125,20 +66,24 @@ export default async function Dashboard() {
                 <TableCell>{"Sensor " + sensor.sensorId.slice(7)}</TableCell>
                 <TableCell className="flex items-center text-left gap-2">
                   <div>
-                    {sensor.status == "ON" ? (
+                    {sensor.status === "ON" ? (
                       <Image src="/EllipseOn.svg" width={15} height={15} alt="" />
-                    ) : sensor.status == "OFF" ? (
+                    ) : sensor.status === "OFF" ? (
                       <Image src="/EllipseOff.svg" width={15} height={15} alt="" />
                     ) : (
                       <Image src="/EllipseErr.svg" width={15} height={15} alt="" />
-                    )}</div>
+                    )}
+                  </div>
                   <div>{sensor.status}</div>
                 </TableCell>
                 <TableCell>{moment(sensor.readingDate).format("DD.MM.YY HH:mm:ss")}</TableCell>
-                <TableCell className="text-left">{sensor.deltaMovementInMm == undefined ? (
-                  "Ingen data") : (
-                  parseFloat(sensor.deltaMovementInMm).toFixed(2) + " mm"
-                )}</TableCell>
+                <TableCell className="text-left">
+                  {sensor.deltaMovementInMm === undefined ? (
+                    "Ingen data"
+                  ) : (
+                    parseFloat(sensor.deltaMovementInMm).toFixed(2) + " mm"
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -175,7 +120,6 @@ export default async function Dashboard() {
                   <path d="M66.2137 66.2137L68.865 68.865" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
 
-
                 <CardTitle>
                   <p>Ingen rasfare</p>
                 </CardTitle>
@@ -189,4 +133,6 @@ export default async function Dashboard() {
       </div>
     </main>
   );
-}
+};
+
+export default Dashboard;
