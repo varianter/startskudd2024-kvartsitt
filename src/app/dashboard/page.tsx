@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
 import { connect, getConnectionInfo } from "@/elastic";
 import moment from "moment";
+import Image from "next/image";
 moment.locale("no");
 export const revalidate = 20;
 
@@ -110,9 +111,23 @@ export default async function Dashboard() {
             {latestSensors.map((sensor: Sensor) => (
               <div key={sensor.sensorId} className="flex justify-between">
                 <p>{"Sensor " + sensor.sensorId.slice(7)}</p>
-                <p>{sensor.status}</p>
+                <p className="flex items-center gap-2">
+                  <div>
+                {sensor.status  == "ON" ? (
+                  <Image src="/EllipseOn.svg" width={15} height={15} alt=""/>
+                ) : sensor.status == "OFF" ? (
+                  <Image src="/EllipseOff.svg" width={15} height={15} alt=""/>
+                ) : (
+                  <Image src="/EllipseErr.svg" width={15} height={15} alt=""/>
+                )
+                }</div>
+                <div>{sensor.status}</div>
+                </p>
                 <p>{moment(sensor.readingDate).format("DD.MM.YY HH:mm:ss")}</p>
-                <p>{parseFloat(sensor.deltaMovementInMm).toFixed(2)}</p> 
+                <p>{sensor.deltaMovementInMm == undefined ? (
+                  "Ingen data") : (
+                  parseFloat(sensor.deltaMovementInMm).toFixed(2) + " mm"
+                  )}</p> 
               </div>
             ))}
           </CardContent>
