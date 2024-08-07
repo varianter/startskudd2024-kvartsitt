@@ -64,7 +64,7 @@ export default async function Dashboard() {
   });
 
   const last24Hours = await client.search({
-    index: 'sensor_readings',
+    index: 'sensor_readings_staging',
     body: {
       query: {
         range: {
