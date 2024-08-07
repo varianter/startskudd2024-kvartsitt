@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
 import Typography from "@/components/ui/typography";
 import { connect, getConnectionInfo } from "@/elastic";
 import moment from "moment";
@@ -100,18 +101,21 @@ export default async function Dashboard() {
         </Card>
         
       </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
-        <Card x-chunk="dashboard-01-chunk-5">
-          <CardHeader>
-            <CardTitle className="gap-2 flex">
-              Sensor Readings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-8">
+      <div className="grid gap-4 md:gap-4 lg:grid-cols-2">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Sensor</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last reading</TableHead>
+              <TableHead>Bevegelse</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="">
             {latestSensors.map((sensor: Sensor) => (
-              <div key={sensor.sensorId} className="flex justify-between">
-                <p>{"Sensor " + sensor.sensorId.slice(7)}</p>
-                <p className="flex items-center gap-2">
+              <TableRow key={sensor.sensorId} className="">
+                <TableCell>{"Sensor " + sensor.sensorId.slice(7)}</TableCell>
+                <TableCell className="flex items-center text-left gap-2">
                   <div>
                 {sensor.status  == "ON" ? (
                   <Image src="/EllipseOn.svg" width={15} height={15} alt=""/>
@@ -122,16 +126,16 @@ export default async function Dashboard() {
                 )
                 }</div>
                 <div>{sensor.status}</div>
-                </p>
-                <p>{moment(sensor.readingDate).format("DD.MM.YY HH:mm:ss")}</p>
-                <p>{sensor.deltaMovementInMm == undefined ? (
+                </TableCell>
+                <TableCell>{moment(sensor.readingDate).format("DD.MM.YY HH:mm:ss")}</TableCell>
+                <TableCell className="text-left">{sensor.deltaMovementInMm == undefined ? (
                   "Ingen data") : (
                   parseFloat(sensor.deltaMovementInMm).toFixed(2) + " mm"
-                  )}</p> 
-              </div>
+                  )}</TableCell> 
+              </TableRow>
             ))}
-          </CardContent>
-        </Card>
+          </TableBody>
+        </Table>
       </div>
     </main>
   );
