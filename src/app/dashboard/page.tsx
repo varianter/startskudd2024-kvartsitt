@@ -93,7 +93,7 @@ export default async function Dashboard() {
       </div>
 
 
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
+      <div className="col-start-1 col-end-3">
         <Table>
           <TableHeader>
             <TableRow>
@@ -129,7 +129,7 @@ export default async function Dashboard() {
         </Table>
       </div>
 
-      <div className="col-span-1">
+      <div className="col-start-3 col-end-7">
         <Card x-chunk="dashboard-01-chunk-5" className="w-96 h-64 mx-auto flex flex-col items-center justify-center">
           <CardContent className="gap-2 flex flex-col items-center justify-center text-center">
             {numberOfAlerts >= 10 ? (
