@@ -66,7 +66,7 @@ export default async function Dashboard() {
   });
 
   const last24Hours = await client.search({
-    index: 'sensor_readings_staging',
+    index: 'sensor_readings',
     body: {
       query: {
         bool: {
@@ -74,7 +74,7 @@ export default async function Dashboard() {
             {
               range: {
                 readingDate: {
-                  gte: 'now-24h',
+                  gte: 'now-3h',
                 }
               }
             },
