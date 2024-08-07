@@ -19,7 +19,9 @@ export default async function Dashboard() {
     ? await client.count()
     : null;
 
-  const sensors = await client.search({index: "sensor_readings", size: 20})
+  const sensors = await client.search({index: "sensor_readings_staging", size: 20})
+
+
   const sensorResponse = await client.search({
     index: 'sensor_readings',
     size: 0,  // No need to fetch actual documents
@@ -64,10 +66,23 @@ export default async function Dashboard() {
     index: 'sensor_readings',
     body: {
       query: {
-        range: {
-          readingDate: {
-            gte: 'now-24h'
-          }
+        bool: {
+          must: [
+            {
+              range: {
+                readingDate: {
+                  gte: 'now-24h',
+                }
+              }
+            },
+            {
+              range: {
+                deltaMovementInMm: {
+                  gt: 5,
+                }
+              }
+            }
+          ]
         }
       }
     }
@@ -79,7 +94,8 @@ export default async function Dashboard() {
   const latestSensors = sensorReading.map((sensor: any) => sensor.latest_reading.hits.hits[0]._source)
 
 
-  const numberOfAlerts = last24Hours.hits.hits.filter((sensor: any) => sensor._source.deltaMovementInMm > 2).length
+  const numberOfAlerts = last24Hours.hits.hits.filter((sensor: any) => sensor._source.deltaMovementInMm > 5).length
+  console.log(numberOfAlerts)
 
 
 
@@ -132,11 +148,11 @@ export default async function Dashboard() {
       ) : (
         <>
          <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M45 60C48.9782 60 52.7936 58.4196 55.6066 55.6066C58.4196 52.7936 60 48.9782 60 45C60 41.0218 58.4196 37.2064 55.6066 34.3934C52.7936 31.5804 48.9782 30 45 30C41.0218 30 37.2064 31.5804 34.3934 34.3934C31.5804 37.2064 30 41.0218 30 45C30 48.9782 31.5804 52.7936 34.3934 55.6066C37.2064 58.4196 41.0218 60 45 60Z" stroke="#FC75FF" strokeWidth="6" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M45 11.25V15" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" stroke-linejoin="round"/>
-<path d="M45 75V78.75" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" stroke-linejoin="round"/>
-<path d="M11.25 45H15" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" stroke-linejoin="round"/>
-<path d="M75 45H78.75" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" stroke-linejoin="round"/>
+<path d="M45 60C48.9782 60 52.7936 58.4196 55.6066 55.6066C58.4196 52.7936 60 48.9782 60 45C60 41.0218 58.4196 37.2064 55.6066 34.3934C52.7936 31.5804 48.9782 30 45 30C41.0218 30 37.2064 31.5804 34.3934 34.3934C31.5804 37.2064 30 41.0218 30 45C30 48.9782 31.5804 52.7936 34.3934 55.6066C37.2064 58.4196 41.0218 60 45 60Z" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M45 11.25V15" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M45 75V78.75" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M11.25 45H15" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M75 45H78.75" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M68.865 21.135L66.2137 23.7862" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M23.7863 66.2137L21.135 68.865" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
 <path d="M21.135 21.135L23.7863 23.7862" stroke="#FC75FF" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
