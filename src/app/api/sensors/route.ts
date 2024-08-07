@@ -40,7 +40,8 @@ export async function GET(request: Request) {
           }
         }
     });
-    const sensorReading = sensorResponse.aggregations?.unique_sensor_ids.buckets;
+    // @ts-ignore
+    const sensorReading = sensorResponse.aggregations?.["unique_sensor_ids"]["buckets"];
     const latestSensorsData = sensorReading.map((sensor: any) => sensor.latest_reading.hits.hits[0]._source);
     // console.log(latestSensorsData);
 
