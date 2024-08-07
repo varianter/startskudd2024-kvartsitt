@@ -23,14 +23,16 @@ export default async function Dashboard() {
     : null;
 
   const sensors = await client.search({index: "sensor_readings", size: 20})
+
+
   const sensorResponse = await client.search({
-    index: 'sensor_readings_staging',
+    index: 'sensor_readings',
     size: 0,  // No need to fetch actual documents
     body: {
       aggs: {
         unique_sensor_ids: {
           composite: {
-            size: 20,  // Number of unique sensorIds to fetch
+            size: 20, 
             sources: [
               {
                 sensorId: {
@@ -64,13 +66,26 @@ export default async function Dashboard() {
   });
 
   const last24Hours = await client.search({
-    index: 'sensor_readings_staging',
+    index: 'sensor_readings',
     body: {
       query: {
-        range: {
-          readingDate: {
-            gte: 'now-24h'
-          }
+        bool: {
+          must: [
+            {
+              range: {
+                readingDate: {
+                  gte: 'now-3h',
+                }
+              }
+            },
+            {
+              range: {
+                deltaMovementInMm: {
+                  gt: 5,
+                }
+              }
+            }
+          ]
         }
       }
     }
@@ -82,7 +97,8 @@ export default async function Dashboard() {
   const latestSensors = sensorReading.map((sensor: any) => sensor.latest_reading.hits.hits[0]._source)
 
 
-  const numberOfAlerts = last24Hours.hits.hits.filter((sensor: any) => sensor._source.deltaMovementInMm > 2).length
+  const numberOfAlerts = last24Hours.hits.hits.filter((sensor: any) => sensor._source.deltaMovementInMm > 5).length
+  console.log(numberOfAlerts)
 
 
 
