@@ -24,12 +24,12 @@ export default async function Dashboard() {
 
   const sensorResponse = await client.search({
     index: 'sensor_readings',
-    size: 0,  // No need to fetch actual documents
+    size: 0,  
     body: {
       aggs: {
         unique_sensor_ids: {
           composite: {
-            size: 20,  // Number of unique sensorIds to fetch
+            size: 20, 
             sources: [
               {
                 sensorId: {
