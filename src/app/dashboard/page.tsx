@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import Typography from '@/components/ui/typography';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Image from 'next/image';
 
 moment.locale('no');
