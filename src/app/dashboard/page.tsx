@@ -24,7 +24,7 @@ export default async function Dashboard() {
 
   const sensors = await client.search({index: "sensor_readings", size: 20})
   const sensorResponse = await client.search({
-    index: 'sensor_readings',
+    index: 'sensor_readings_staging',
     size: 0,  // No need to fetch actual documents
     body: {
       aggs: {
@@ -52,7 +52,7 @@ export default async function Dashboard() {
                   }
                 ],
                 _source: {
-                  includes: ['sensorId', 'status', 'readingDate', 'deltaMovementInMm' ]
+                  includes: ['sensorId', 'status', 'readingDate', 'deltaMovementInMm']
                 },
                 size: 1
               }
