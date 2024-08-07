@@ -2,7 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
 import { connect, getConnectionInfo } from "@/elastic";
-
+import moment from "moment";
+moment.locale("no");
 export const revalidate = 20;
 
 interface Sensor {
@@ -108,9 +109,9 @@ export default async function Dashboard() {
           <CardContent className="grid gap-8">
             {latestSensors.map((sensor: Sensor) => (
               <div key={sensor.sensorId} className="flex justify-between">
-                <p>{sensor.sensorId}</p>
+                <p>{"Sensor " + sensor.sensorId.slice(7)}</p>
                 <p>{sensor.status}</p>
-                <p>{sensor.readingDate}</p>
+                <p>{moment(sensor.readingDate).format("DD.MM.YY HH:mm:ss")}</p>
                 <p>{parseFloat(sensor.deltaMovementInMm).toFixed(2)}</p> 
               </div>
             ))}
