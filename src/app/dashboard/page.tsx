@@ -2,8 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
 import { connect, getConnectionInfo } from "@/elastic";
-import rasfare from './rasfare.svg'; 
-import ingenRasfare from './ingenRasfare.svg'; 
 
 export const revalidate = 20;
 
