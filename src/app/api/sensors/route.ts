@@ -70,5 +70,5 @@ export async function GET(request: Request) {
         }
         }});
     const alertCount = last24Hours.hits.hits.filter((sensor: any) => sensor._source.deltaMovementInMm > 5).length;
-    return new Response(JSON.stringify({latestSensorsData: latestSensorsData, alertCount: alertCount}));
+    return new Response(JSON.stringify({latestSensorsData: latestSensorsData, alertCounts: alertCount}));
   }

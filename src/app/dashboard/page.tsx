@@ -23,7 +23,6 @@ const Dashboard: React.FC = () => {
     const setData = async () => {
       const response = await fetch('/api/sensors');
       const data = await response.json();
-      console.log(data);
       setLatestSensors(data.latestSensorsData);
       setNumberOfAlerts(data.alertCounts);
     }
