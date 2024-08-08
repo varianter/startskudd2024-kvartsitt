@@ -18,30 +18,20 @@ interface Sensor {
 const Dashboard: React.FC = () => {
   const [latestSensors, setLatestSensors] = useState<Sensor[]>([]);
   const [numberOfAlerts, setNumberOfAlerts] = useState<number>(0);
-  const setDataStart = async () => {
-    const response = await fetch('/api/sensors');
-    const data = await response.json();
-    console.log(data);
-    setLatestSensors(data.latestSensorsData);
-    setNumberOfAlerts(data.alertCounts);
-  }
-  setDataStart();
-
+  
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch data from API with 5 second interval
-      const interval = setInterval(async () => {
-        const response = await fetch("/api/sensors");
-        const data = await response.json();
-        console.log(data);
-        setLatestSensors(data.latestSensorsData);
-        setNumberOfAlerts(data.alertCounts);
-      }
-      , 5000);
-        return () => clearInterval(interval); // Cleanup the interval on component unmount
-      };
-
-    fetchData();
+    const setData = async () => {
+      const response = await fetch('/api/sensors');
+      const data = await response.json();
+      console.log(data);
+      setLatestSensors(data.latestSensorsData);
+      setNumberOfAlerts(data.alertCounts);
+    }
+    setData();
+    const interval = setInterval(async () => {
+      setData();
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
