@@ -43,7 +43,6 @@ export async function GET(request: Request) {
     // @ts-ignore
     const sensorReading = sensorResponse.aggregations?.["unique_sensor_ids"]["buckets"];
     const latestSensorsData = sensorReading.map((sensor: any) => sensor.latest_reading.hits.hits[0]._source);
-    // console.log(latestSensorsData);
 
     const last24Hours = await client.search({
         index: 'sensor_readings',
