@@ -88,7 +88,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="col-start-3 col-end-7">
-        <Card x-chunk="dashboard-01-chunk-5" className="w-96 h-64 mx-auto flex flex-col items-center justify-center">
+        <Card x-chunk="dashboard-01-chunk-5" className="w-96 h-96 mx-auto flex flex-col items-center justify-center">
           <CardContent className="gap-2 flex flex-col items-center justify-center text-center">
             {numberOfAlerts >= 10 ? (
               <>
