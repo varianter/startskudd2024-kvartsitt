@@ -1,4 +1,5 @@
 import { connect, getConnectionInfo } from '@/elastic';
+export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
     const client = await connect();
     const sensorResponse = await client.search({
